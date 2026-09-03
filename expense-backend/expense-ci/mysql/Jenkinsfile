@@ -28,15 +28,15 @@ pipeline {
             }
         } */
         stage('Read version.json') {
-    steps {
-        dir('expense-backend/expense-ci/backend') {
+        steps {
+        dir('expense-backend/expense-ci/mysql') {
             script {
                 def versionJson = readJSON file: 'version.json'
                 appVersion = versionJson.version
                 echo "Version: ${appVersion}"
             }
+         }
         }
-    }
     }
     stage('Docker Build') {
         steps {
