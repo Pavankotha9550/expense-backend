@@ -29,7 +29,7 @@ pipeline {
         } */
     stage('Docker Build') {
         steps {
-            dir('expense-backend/expense-backend/expense-ci/mysql'){
+            dir('expense-backend/expense-ci/mysql'){
             script {
                 withAWS(credentials: 'aws-creds', region: 'us-east-1') {
                     sh """
