@@ -45,7 +45,9 @@ pipeline {
                 }
             }
         }
-        stage('Trigger backend') {
+        
+    }
+    stage('Trigger backend') {
             steps {
                 script {
                     build job: 'backend', 
@@ -54,7 +56,6 @@ pipeline {
                 }
             }
         }
-    }
     /* stage('Trigger Deploy') {
             when{
                 expression { params.deploy }
