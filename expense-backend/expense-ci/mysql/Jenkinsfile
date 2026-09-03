@@ -28,16 +28,16 @@ pipeline {
             }
         } */
         stage('Read version.json') {
-            steps {
-                dir('expense-backend/expense-ci/backend') {
-                    script {
-                        def versionJson = readJSON file: 'version.json'
-                        appVersion = versionJson.version
-                        echo " version: ${appVersion}"
-                    }
-                }   
+    steps {
+        dir('expense-backend/expense-ci/backend') {
+            script {
+                def versionJson = readJSON file: 'version.json'
+                appVersion = versionJson.version
+                echo "Version: ${appVersion}"
             }
         }
+    }
+    }
     stage('Docker Build') {
         steps {
             dir('expense-backend/expense-ci/mysql'){
