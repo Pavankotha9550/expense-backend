@@ -18,9 +18,9 @@ pipeline {
     }
      // Build
     stages {
-        /* stage('Read package.json') {
+         stage('Read package.json') {
             steps {
-                dir('expense-backend/expense-backend') {
+                dir('expense-backend/expense-ci/backend') {
                     script {
                         def packageJson = readJSON file: 'package.json'
                         appVersion = packageJson.version
@@ -28,7 +28,7 @@ pipeline {
                     }
                 }   
             }
-        } */
+        }
     /* stage('Install Dependencies') {
             steps {
                 script {
