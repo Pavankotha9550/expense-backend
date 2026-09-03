@@ -29,7 +29,7 @@ pipeline {
         } */
     stage('Docker Build') {
         steps {
-            dir('expense-backend/expense-ci/mysql'){
+            dir('expense-backend/expense-backend/expense-ci/mysql'){
             script {
                 withAWS(credentials: 'aws-creds', region: 'us-east-1') {
                     sh """
@@ -42,6 +42,15 @@ pipeline {
                         docker push ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${PROJECT}/${COMPONENT}:${appVersion}
                     """
                     }
+                }
+            }
+        }
+        stage('Trigger backend') {
+            steps {
+                script {
+                    build job: 'backend', 
+                      propagate: false,  // even SG fails VPC will not be effected
+                      wait: false // VPC will not wait for SG pipeline completion
                 }
             }
         }
