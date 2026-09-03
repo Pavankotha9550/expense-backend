@@ -7,7 +7,7 @@ pipeline {
         REGION = "us-east-1"
         ACC_ID = "490004627649"
         PROJECT = "expense"
-        COMPONENT = "backend"
+        COMPONENT = "frontend"
     }
     options {
         timeout(time: 30, unit: 'MINUTES') 
@@ -18,7 +18,7 @@ pipeline {
     }
      // Build
     stages {
-        stage('Read package.json') {
+        /* stage('Read package.json') {
             steps {
                 dir('expense-backend/expense-backend') {
                     script {
@@ -28,8 +28,8 @@ pipeline {
                     }
                 }   
             }
-        }
-    stage('Install Dependencies') {
+        } */
+    /* stage('Install Dependencies') {
             steps {
                 script {
                    sh """
@@ -37,10 +37,21 @@ pipeline {
                    """
                 }
             }
+        } */
+    stage('Read version.json') {
+        steps {
+        dir('expense-backend/expense-ci/frontend') {
+            script {
+                def versionJson = readJSON file: 'version.json'
+                appVersion = versionJson.version
+                echo "Version: ${appVersion}"
+            }
+         }
         }
+    }
     stage('Docker Build') {
         steps {
-            dir('expense-backend/expense-backend'){
+            dir('expense-backend/expense-ci/frontend'){
             script {
                 withAWS(credentials: 'aws-creds', region: 'us-east-1') {
                     sh """
@@ -57,7 +68,7 @@ pipeline {
             }
         }
     }
-    stage('Trigger Deploy') {
+    /* stage('Trigger Deploy') {
             when{
                 expression { params.deploy }
             }
@@ -74,7 +85,7 @@ pipeline {
             }
         }
         
-    }
+    } */
 
     post { 
         always { 
