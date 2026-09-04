@@ -21,6 +21,7 @@ pipeline {
 
         stage('Deploy') {
                 steps {
+                    dir('expense-backend/expense-cd/mysql'){
                     script {
                         withAWS(credentials: 'aws-creds', region: 'us-east-1') {
                             sh """
@@ -33,6 +34,7 @@ pipeline {
                             """
                         }
                     }
+                }
                 }
             }
         stage('Check Status'){
