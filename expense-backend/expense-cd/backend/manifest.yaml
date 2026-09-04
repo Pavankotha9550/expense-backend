@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-backend
+  namespace: expense
+  labels:
+    name: configmap-backend
+    project: expense
+data:
+  # property-like keys; each key maps to a simple value
+  DB_HOST: "service-mysql"
+  
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: expense
+  labels:
+    name: deployment-backend
+    project: expense
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: deployment-backend
+      project: expense
+  template:
+    metadata:
+      labels:
+        name: deployment-backend
+        project: expense
+    spec:
+      containers:
+      - name: backend
+        image: pavankotha9550/expense-backend:v2
+        envFrom:
+        - configMapRef:
+            name: configmap-backend
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: expense
+  labels:
+    name: expense
+    server: backend
+    env: dev
+spec:
+  selector:
+    name: deployment-backend
+    project: expense
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

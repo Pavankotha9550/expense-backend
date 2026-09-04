@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expense
+  namespace: expense
+  labels:
+    purpose: ingress
+    project: expense
+    app: expense
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      purpose: ingress
+      project: expense
+      app: expense
+  template:
+    metadata:
+      labels:
+        purpose: ingress
+        project: expense
+        app: expense
+    spec:
+      containers:
+      - name: expense
+        image: pavankotha9550/expense-frontend:v2
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: expense
+  namespace: expense
+  labels:
+    purpose: ingress
+    project: expense
+    app: expense
+spec:
+  type: ClusterIP  # <-- Changed from LoadBalancer
+  selector:
+    purpose: ingress
+    project: expense
+    app: expense
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: expense
+  namespace: expense
+  annotations:
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/group.name: expense
+spec:
+  ingressClassName: alb
+  rules:
+  - host: "expense.daws84.cyou"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: expense
+            port:
+              number: 80

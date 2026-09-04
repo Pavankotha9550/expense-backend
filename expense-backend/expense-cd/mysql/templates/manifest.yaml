@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-mysql-headless
+  namespace: expense
+  labels:
+    name: expense
+    server: service-mysql
+spec:
+  clusterIP: None
+  selector:
+    purpose: statefulset
+    project: expense
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secret-mysql
+  labels:
+    project: expense
+type: Opaque
+data:
+  MYSQL_ROOT_PASSWORD: "RXhwZW5zZUFwcEAx"
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-mysql
+  namespace: expense
+  labels:
+    name: expense
+    server: service-mysql
+spec:
+  #clusterIP: None
+  selector:
+    purpose: statefulset
+    project: expense
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql-statefulset
+  namespace: expense
+  labels:
+    name: mysql
+    type: databases
+spec:
+  selector:
+    matchLabels:
+      purpose: statefulset
+      project: expense # has to match .spec.template.metadata.labels (these should be pod labels)
+  serviceName: "service-mysql-headless" # this should be headless service(till here it was satteful)
+  replicas: 2 # by default is 1(from here it was pod)
+  template:
+    metadata:
+      labels:
+        purpose: statefulset
+        project: expense # has to match .spec.selector.matchLabels (pod labels should match with stateful)
+    spec:
+      containers:
+      - name: mysql
+        image: "{{ .Values.deployment.imageURL}}:{{ .Values.deployment.imageVersion }}"
+        envFrom:
+        - secretRef:
+            name: secret-mysql
+        volumeMounts:
+        - name: www
+          mountPath: /var/lib/mysql
+  # This is nothing but PVC, you can directly create here
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "ebs-dynamic-sc-mysql"
+      resources:
+        requests:
+          storage: 2Gi
